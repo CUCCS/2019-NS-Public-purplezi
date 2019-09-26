@@ -207,7 +207,7 @@
 
 #### 4.5 所有节点均可以访问互联网
 
-* 将4个虚拟机电脑ping www.baidu.com，都可以ping通。
+* 将4个虚拟机电脑ping百度的网址，都可以ping通。
 
   ![pingbaidu](pingbaidu.png)
 
