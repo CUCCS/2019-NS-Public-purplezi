@@ -217,5 +217,5 @@
 
 ## 参考资料
 
-* [师姐的作业](https://github.com/CUCCS/2018-NS-Public-jckling/blob/master/ns-0x01/基于VirtualBox的网络攻防基础环境搭建.md))
+* [师姐的作业](https://github.com/CUCCS/2018-NS-Public-jckling/blob/master/ns-0x01/基于VirtualBox的网络攻防基础环境搭建.md)
 
