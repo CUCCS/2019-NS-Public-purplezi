@@ -275,8 +275,8 @@
   ![iptables](images/iptables.png)
 
 * DNAT（Destination Network Address Translation,目的地址转换)通常被叫做目的映射，SNAT（Source Network Address Translation，源地址转换）通常被叫做源映射。
-  * MASQUERADE这个设定值就是IP伪装成为封包出去(-o)的那块装置上的IP。
-  * 由语句`iptables -t nat -A(append) POSTROUTING -s '172.16.222.0/24' ! -d '172.16.222.0/24' -o -enp0s3 -j MASQUERADE`不管现在enp0s3的出口获得了怎样的动态ip，MASQUERADE会自动读取enp0s3现在的ip地址然后做SNAT出去，这样就实现了很好的动态SNAT地址转换。
+  * 由语句`iptables -t nat -A(append) POSTROUTING -s '172.16.222.0/24' ! -d '172.16.222.0/24' -o -enp0s3 -j MASQUERADE`，`-j MASQUERADE`的含义是去动态SNAT。不管现在enp0s3的出口获得了怎样的动态ip，MASQUERADE会自动读取enp0s3现在的ip地址然后做SNAT出去，实现了动态SNAT地址转换。
+  * 即内部网络和外部的通信中，内部网络的IP地址会被网关封装成自己enp0s3网卡的IP地址，NAT的原理是把内部IP映射成外部IP+端口，通过将内部网络IP地址(私网IP)替换为出口的IP地址提供公网可达性和上层协议的连接能力，所以从内部网络发数据包给外网时，通过网关将该数据包的IP地址换为填入网关的IP地址，所以叫源地址转换。
   * 只和靶机的连通性有关。
 
 ## 参考资料
