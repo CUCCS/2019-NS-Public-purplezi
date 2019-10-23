@@ -197,7 +197,7 @@
   
   * 上述证明，两个靶机不在同一个局域网中，所以他们在链路层和网络层上是无法通信的。两个靶机分别和网关在同一个局域网中，他们都和攻击者主机不在同一个局域网中。攻击者主机和网关在同一个局域网中。
   
-  * 在网关网络接口的配置中可以得到进一步的证实，其实和两个内部网络不互通是同一个道理。首先明确攻击者主机和靶机处于不同的网段中，当攻击者主机发数据包给靶机时，该数据包需要通过网关的端口转发，而网关将目的地址为内部网络1的网段和内部网络2的网段都丢弃(DROP)，而且不返回任何出错信息，所以攻击者主机无法访问靶机。由语句`iptables -P FORWARD DROP`推测，任何外界的数据包都无法访问两个内部网络的结论，因为路由器没有配置相应的端口转发，将数据包默认丢弃。
+  * 在网关网络接口的配置中可以得到进一步的证实，其实和两个内部网络不互通是同一个道理，因为网关没有配置相应的端口转发。首先明确攻击者主机和靶机处于不同的网段中，当攻击者主机发数据包给靶机时，该数据包需要通过网关的端口转发，由语句`iptables -P FORWARD DROP`(-P policy表示更改规则)可知，网关设置是将目的地址为内部网络1的网段和内部网络2的网段都丢弃(DROP)，而且不返回任何出错信息，所以攻击者主机无法访问靶机。
 
   ![port-fprward-attacker-disconnect-victim](images/port-forward-victimcanping.png)
 
@@ -216,7 +216,7 @@
 
 * 实验分析：
   * 网关可以直接访问攻击者主机是因为两者处于同一NAT网络。
-  * 网关可以直接访问靶机的原因：因为网关和靶机1处于同一个内部网络1，和靶机2处于同一个内部网络2，在同一个内部网络的虚拟机可以相互访问，无需路由器的端口转发。
+  * 网关可以直接访问靶机的原因：因为网关和靶机1处于同一个内部网络1，和靶机2处于同一个内部网络2。仍可以通过网关的网络接口配置的分析得出，语句`iptables -I FORWARD -s '172.16.111.0/24' -d '172.16.111.0/24' -i enp0s9 -j ACCEPT`直译是在FORWARD链上添加(-I)一条规则（链上的规则在数据包进入该链后触发），规则内容是：当源地址(-s)与目标地址(-d)都在172.16.111.0/24这个子网内，且是由enp0s9这个网卡(-i指定网卡)接受到该包的话，那么认为该包通过FORWARD的链的过滤，可以送入(-j)POSTROUTING链了，即可以发送。通俗来讲即告诉网关子网里主机间的通信应该转发，所以我们才可以得出内部网络间的机器可以相互通信。
   
   
 #### 4.4 靶机的所有对外上下行流量必须经过网关
@@ -232,7 +232,8 @@
   
   ![victim2-ping-withoutGW](images/victim2-ping-withoutGW.png)
 
-
+* 通过语句`iptables -P FORWARD DROP`，知道网关配置了丢弃所有待转发的包。网关转发时能连通，不转发不能连通，能够证明靶机的所有对外上下行流量必须是经过网关的。
+  
 #### 4.5 所有节点均可以访问互联网
 
 * 将4个虚拟机电脑ping百度的网址，都可以ping通。
@@ -273,12 +274,10 @@
 
   ![iptables](images/iptables.png)
 
-### 3. 残余问题
-
-* **其实还是不太明白的几点：**
-  * 语句`iptables -I FORWARD -s '172.16.111.0/24' -d '172.16.111.0/24' -i enp0s9 -j ACCEPT`的理解是表示内部网络1发送的数据包可以被转发到除内部网络1的外的网段？
-  * 为什么攻击者主机无法访问靶机，在网关interfaces证明外网不可以访问两个内部网络的语句是`iptables -P FORWARD DROP`？表示默认将转发的数据包丢弃？
-  * interfaces表中的MASQUERADE是否和网关和攻击者主机的连通性有关？
+* DNAT（Destination Network Address Translation,目的地址转换)通常被叫做目的映射，SNAT（Source Network Address Translation，源地址转换）通常被叫做源映射。
+  * MASQUERADE这个设定值就是IP伪装成为封包出去(-o)的那块装置上的IP。
+  * 由语句`iptables -t nat -A(append) POSTROUTING -s '172.16.222.0/24' ! -d '172.16.222.0/24' -o -enp0s3 -j MASQUERADE`不管现在enp0s3的出口获得了怎样的动态ip，MASQUERADE会自动读取enp0s3现在的ip地址然后做SNAT出去，这样就实现了很好的动态SNAT地址转换。
+  * 只和靶机的连通性有关。
 
 ## 参考资料
 
@@ -289,3 +288,6 @@
 * [virtualbox的network mode](http://download.virtualbox.org/virtualbox/UserManual.pdf)
   
 * [iptables的参数讲解](cnblogs.com/kevingrace/p/6265113.html)
+* [理解iptables中DNAT、SNAT和MASQUERADE](jianshu.com/p/beeb6094bcc9)
+
+
