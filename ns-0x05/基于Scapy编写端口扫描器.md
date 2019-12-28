@@ -42,8 +42,8 @@
   - [ ] TCP connect scan / TCP stealth scan
   - [ ] TCP Xmas scan / TCP fin scan / TCP null scan
   - [ ] UDP scan
-- [ ] 上述每种扫描技术的实现测试均需要测试端口状态为：开放、关闭 和 过滤 状态时的程序执行结果
-- [ ] 提供每一次扫描测试的抓包结果并分析与课本中的扫描方法原理是否相符？如果不同，试分析原因；
+- [x] 上述每种扫描技术的实现测试均需要测试端口状态为：开放、关闭 和 过滤 状态时的程序执行结果
+- [x] 提供每一次扫描测试的抓包结果并分析与课本中的扫描方法原理是否相符？如果不同，试分析原因；
 - [x] 在实验报告中详细说明实验网络环境拓扑、被测试 IP 的端口状态是如何模拟的
 - [ ] （可选）复刻 nmap 的上述扫描技术实现的命令行参数开关
 
@@ -80,29 +80,47 @@
       # --dport destination port
       ```
       ![](imgs/filter.gif)
+- py代码编写
+  - dst_ip = victim-1 ip =  172.16.111.139
+  - dst_port = 80
 
 #### TCP connect scan / TCP stealth scan
 
 - `TCP connect scan`与`TCP stealth scan`都是先发送一个`S`，然后等待回应。如果有回应且标识为`RA`，说明目标端口处于关闭状态；如果有回应且标识为`SA`，说明目标端口处于开放状态。这时
   - `TCP connect scan`会回复一个`RA`，在完成三次握手的同时断开连接
   - `TCP stealth scan`只回复一个`R`，不完成三次握手，直接取消建立连接
-
 - TCP connect scan
-  - 在`victim-``靶机设置监听eth0网卡开始抓包
+  - 在`victim-1`靶机设置监听eth0网卡开始抓包
     - eth0是victim的ip地址
     - 在`Kali-Attacker`攻击者虚拟机运行扫描文件TCP_connect_scan.py，停止抓包，存储在本地。
+  - 课本
+    - `Attacker`发送`SYN+PORT`
+      - 端口开放状态：目标主机`victim-1`接收到一个`SYN/ACK`数据包；
+      - 端口关闭状态：目标主机`victim-1`接收到一个`RST/ACK`数据包，端口关闭并且链接将会被重置；
+      - 端口过滤状态：目标主机`victim-1`没有任何响应。
+  - py代码编写问题：
+    - 要加入`ICMP`的判断，端口处于过滤状态时，会发送ICMP包表示`Port unreachable`。
   - 扫描结果
-    - 端口关闭
-    - 端口
 
+      <img src="imgs/tcp_connect_scan.png" height=70%>
+
+      ![](imgs/tcp_connect_scan.gif)
 - TCP stealth scan
-  
+  - 课本
+    - `Attacker`发送SYN+PORT
+      - 端口开放状态：返回SYN+ACK；
+      - 端口关闭状态：返回RST+ACK；
+      - 端口过滤状态：超时无响应，或返回ICMP ERROR(Type3,Code 1,2,3,9,10,13)
+  - 扫描结果同TCP connect scan
+      ![](imgs/tcp_stealth_scan.gif)
+
 #### TCP Xmas scan / TCP fin scan / TCP null scan
 
 - TCP Xmas scan、TCP fin scan及TCP Null scan不涉及三次交互。它们都是先发送一个包，然后根据目标主机是否回复R来目标端口的状态。不同的是：
   - TCP Xmas scan发送的是FPU
   - TCP fin scan发送的是F
   - TCP Null scan发送的包里没有设置任何flag
+- 
 
 ### UDP端口扫描
 
@@ -127,13 +145,17 @@
     update-alternatives --config python
     ```
 4. 把port22的端口设置为filter，此时ssh失效，把防火墙的配置更改回来
-      <img src="imgs/port22reject.png">
+      <img src="imgs/port22reject.png" width=70%>
       ```
       iptables -L INPUT --line-numbers
       # 查找所有的规则
       iptables -D INPUT 11 （注意，这个11是行号，是iptables -L INPUT --line-numbers 所打印出来的行号）
       # 删除一条规则
       ```
+5. `gdk_cursor_new_for_display: assertion 'GDK_IS_DISPLAY (display)' failed`
+      原因：远程登陆服务器
+      <img src="imgs/gdkerror.png" width=70%>
+  
 ## 参考资料
 
 - [port scanning using scapy](https://resources.infosecinstitute.com/port-scanning-using-scapy/)
