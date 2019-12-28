@@ -1,15 +1,14 @@
-#! /usr/bin/python
+#!/usr/bin/python
+from scapy.all import *
 import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
-from scapy.layers.inet import IP,UDP, TCP, ICMP
-from scapy.all import sr,sr1,RandShort
 
-dst_ip = "172.16.111.136"
+dst_ip = "172.16.111.139"
 src_port = RandShort()
-dst_port=80
+dst_port = 80
 
 stealth_scan_resp = sr1(IP(dst=dst_ip)/TCP(sport=src_port,dport=dst_port,flags="S"),timeout=10)
-if(str(type(stealth_scan_resp))=="<type 'NoneType'>"):
+if(str(type(stealth_scan_resp))=="<class 'NoneType'>"):
     print ("Filtered")
 elif(stealth_scan_resp.haslayer(TCP)):
     if(stealth_scan_resp.getlayer(TCP).flags == 0x12):
