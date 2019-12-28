@@ -8,6 +8,34 @@
 - [x] 第五章课后作业的实验环境搭建小提示 (13:14)
 - [ ] 关于「端口」状态和操作的表达方式讨论 (09:50) 听懂了一半一半
 
+
+- 网络扫描过程中的抓包分析实战
+  - 环境搭建
+    - 在靶机主机的host-only下抓包
+
+        ```bash
+        tcpdump -i eth1 -n -s 65535 -w 20191227.cap
+        
+        # -i 指定监听的网络接口 eht1 用网卡eth1抓包
+        # -n 不把网络地址转换成名字
+        # -s 指定包的大小 65535在现实中达不到，局域网最大帧长度158字节
+        # -w 直接将分组写入文件中，而不是不分析并打印出来
+        ```
+    - 在靶机？？ 192.168.56.104
+            netstat -aonp | grep 8888 该端口没有监听程序？？？
+
+    - 在攻击者主机 待会往8888的端口发送数据，`nc 192.168.56.104 8888`  建立连接
+        
+        <img src="scapy_imgs/noconnection.png" width=70%>
+
+        结果分析，建立不起连接，发送数据包也没用
+    - 分析包
+      - 过滤掉不相关的流量
+      - 去掉和主机host之间的数据包
+            ```bash
+            tcpdump -r xxx.cap -n "not host <ipv4>" 
+            # -n 过滤掉bogon
+            ```
 - scapy使用
   - `help(函数) help(IP)`查看帮助信息，`:q退出 / 进行搜索` 
   - [更新scapy](https://scapy.readthedocs.io/en/latest/installation.html)
