@@ -28,7 +28,11 @@
 
 概览
 - [WebGoat的搭建](#webgoat%e7%9a%84%e6%90%ad%e5%bb%ba)
-- [](#parameter-tampering-%e6%9c%aa%e9%aa%8c%e8%af%81%e7%9a%84%e7%94%a8%e6%88%b7%e8%be%93%e2%bc%8a)
+- [Parameter Tampering 未验证的用户输⼊](#parameter-tampering-%e6%9c%aa%e9%aa%8c%e8%af%81%e7%9a%84%e7%94%a8%e6%88%b7%e8%be%93%e2%bc%8a)
+- [Injection Flaws 注⼊缺陷](#injection-flaws-%e6%b3%a8%e2%bc%8a%e7%bc%ba%e9%99%b7)
+- [Cross-Site Scripting 跨站脚本](#cross-site-scripting)
+- [Authentication Flows 认证缺陷](#authentication-flows-%e8%ae%a4%e8%af%81%e7%bc%ba%e9%99%b7)
+- [Malicious Execution 恶意执行](#malicious-execution-%e6%81%b6%e6%84%8f%e6%89%a7%e8%a1%8c)
 
 #### WebGoat的搭建
 
@@ -190,13 +194,46 @@
 </HTML>
 ```
 - 实验过程
-  - 先上传图片
+  - 先上传真实图片；
   - 后上传`.jsp`，虽然是`.jsp`文件，但是浏览器的预览功能还是会识别成图片，所以可以右键`view image info`和`copy image location`。
-  - 一旦`copy image location`后，将代码放入网址栏？？？，就可以成功执行
+  - 一旦`copy image location`后，paste到地址栏，就可以成功执行
 
-    <img src="imgs/MaliciousFileExecution.gif">
+    <img src="imgs/MaliciousFileExecution.gif" width=70%>
 
 ### Juice Shop
+
+#### Juice Shop 环境搭建
+
+- 从`Webgoat`目录切换到`juice shop`目录，启动环境，查看容器显示healthy。
+    
+    <img src="imgs/juiceshophealthy.png">
+- 同理`Webgoat`的登录，以`127.0.0.1:3000`登录`juice shop`并且注册。
+- **寻找计分板scoreboard**
+  - 对于不熟前端的人，(跪
+  - 页面源代码，无
+  - 查看mainxxx.js
+
+      <img src="imgs/scoreboard.png" width=70%>
+  - 在网址栏输入`127.0.0.1:3000/#/score-board`，成功。
+
+#### XSS
+
+- DOM XSS
+  - 通过在输入框输入`<iframe src="javascript:alert(`xss`)"></iframe>`，从而触发`xss`弹框，攻击成功
+  - `iframe`用于在网页内显示网页
+
+      <img src="imgs/DOMxss.gif" width=70%>
+
+#### Injection
+
+##### SQL Injection
+
+- Goal：log in with the administrator's user account
+- 通过把SQL命令将查询字符串插入到Web表单递交等位置，最终达到欺骗服务器执行恶意的SQL命令
+- 实验步骤：
+  - 首先进入登陆`Account login`的页面；
+  - 通过输入错误信息`' 或者 ' OR`，引发错误提示`Error Handling`；
+  - `' OR true--`作为用户名，密码任填，能够以admin的方式登录。
 
 ## 实验问题解决与总结
 
