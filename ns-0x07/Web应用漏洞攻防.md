@@ -164,7 +164,7 @@
 
 ##### Stored XSS Attacks 「WebGoat-7.1」
 
-<img src="imgs/storexss.gif" width=70%>
+<img src="imgs/storexss.gif">
 
 ##### Stored XSS Attacks (跨站点脚本XSS) 「WebGoat-8.0」
 
@@ -198,7 +198,7 @@
   - 后上传`.jsp`，虽然是`.jsp`文件，但是浏览器的预览功能还是会识别成图片，所以可以右键`view image info`和`copy image location`。
   - 一旦`copy image location`后，paste到地址栏，就可以成功执行
 
-    <img src="imgs/MaliciousFileExecution.gif" width=70%>
+    <img src="imgs/MaliciousFileExecution.gif">
 
 ### Juice Shop
 
@@ -222,7 +222,7 @@
   - 通过在输入框输入`<iframe src="javascript:alert(`xss`)"></iframe>`，从而触发`xss`弹框，攻击成功
   - `iframe`用于在网页内显示网页
 
-      <img src="imgs/DOMxss.gif" width=70%>
+      <img src="imgs/DOMxss.gif">
 
 #### Injection
 
