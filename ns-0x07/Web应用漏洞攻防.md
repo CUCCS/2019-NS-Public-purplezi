@@ -47,7 +47,7 @@
     apt policy docker.io
     # 查看docker镜像，显示Installed
     ```
-  - [使用老师提供的代码](https://github.com/c4pr1c3/ctf-games)，配置环境。
+  - 使用[老师提供的代码](https://github.com/c4pr1c3/ctf-games)，配置环境。
     ```
     # 一次获取所有文件（包括所有子模块管理的文件）
     git clone https://github.com/c4pr1c3/ctf-games.git --recursive
@@ -250,6 +250,9 @@
 
    systemctl stop docker
    # 关闭
+
+   # 该解决方法的问题
+   解决Docker服务未启动时，用了较老的service指令去查看状态，但又用了较新的systemctl指令去启动服务，用systemctl统一。
    ```
 
 ## 参考资料
