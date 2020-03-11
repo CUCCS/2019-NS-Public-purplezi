@@ -82,6 +82,7 @@
     - `Burp Suite`的设置
 
         <img src="imgs/proxylistenrunning.png" width=70%>
+    - 点击火狐浏览器的右上角圆圈符号，选择刚创建的`burpsuite`代理
   - 手动更改Firefox的Connection Settings 
     - HTTP Proxy 127.0.0.1 Port:8080(Burp Suite默认)
     - No Proxy for  去掉 `localhost,127.0.0.1`
